@@ -1,0 +1,298 @@
+/**
+ * This class constructs a 2D array of RGBColor objects. The array is a
+ * representation of a 2D color image.
+ * 
+ * @author Matan Shuster
+ * @version 17/04/2021
+ */
+public class RGBImage {
+    /**
+     * Main array that contains image data.
+     */
+    private RGBColor[][] _image;
+
+    /**
+     * Constructs a black RGBImage.
+     * 
+     * @param rows how many rows in image.
+     * @param cols how many collumns in image.
+     */
+    public RGBImage(int rows, int cols) {
+        // initialise instance variables
+        this._image = new RGBColor[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this._image[i][j] = new RGBColor();
+            }
+        }
+    }
+
+    /**
+     * Constructs a RGBImage based on existing RGBColor array.
+     * 
+     * @param pixels RGBColor array.
+     */
+    public RGBImage(RGBColor[][] pixels) {
+        this._image = new RGBColor[pixels.length][pixels[0].length];
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                this._image[i][j] = new RGBColor(pixels[i][j]);
+            }
+        }
+    }
+
+    /**
+     * Constructs a RGBImage which is a copy of an other RGBImage.
+     * 
+     * @param other The RGBImage to copy.
+     */
+    public RGBImage(RGBImage other) {
+        this._image = new RGBColor[other.getHeight()][other.getWidth()];
+        this._image = other.toRGBColorArray();
+    }
+
+    /**
+     * Gets the height of the image in pixels.
+     * 
+     * @return The height of image.
+     */
+    public int getHeight() {
+        return (this._image.length);
+    }
+
+    /**
+     * Gets the width of the image in pixels.
+     * 
+     * @return The width of the image.
+     */
+    public int getWidth() {
+        return (this._image[0].length);
+    }
+
+    /**
+     * Returns pixel in x y location returns a black RGBColor if x y location is
+     * outside of image
+     * 
+     * @param row The row of the pixel to get
+     * @param col The column of the pixel to get
+     * @return The pixel at x y location
+     */
+    public RGBColor getPixel(int row, int col) {
+        if ((row < this.getHeight()) && (col < this._image[row].length)) {
+            return (this._image[row][col]);
+        } else {
+            return new RGBColor();
+        }
+    }
+
+    /**
+     * Sets the pixel at given location
+     * 
+     * @param row   The row of pixel to set
+     * @param col   The column of pixel to set
+     * @param pixel RGB values to set at location
+     */
+    public void setPixel(int row, int col, RGBColor pixel) {
+        if ((row < this.getHeight()) && (col < this._image[row].length)) {
+            this._image[row][col] = new RGBColor(pixel);
+        }
+    }
+
+    /**
+     * Return true if each pixel in image is equal, and if they have same height and
+     * width.
+     * 
+     * @param other The other RGBImage to compare to.
+     * @return true if RGBImages are equal.
+     */
+    public boolean equals(RGBImage other) {
+        boolean check = true;
+        if (this.getHeight() != other.getHeight() || this.getWidth() != other.getWidth()) {
+            return (false);
+        }
+        while (check) {
+            for (int i = 0; i < this.getWidth(); i++) {
+                for (int j = 0; j < this.getHeight(); j++) {
+                    if (this.getPixel(i, j) != other.getPixel(i, j)) {
+                        check = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return (check);
+    }
+
+    /**
+     * Flips the image around the vertical axis. The first column becomes the last
+     * column and the last row becomes the first row.
+     */
+    public void flipHorizontal() {
+        RGBColor[][] temp = new RGBColor[this.getHeight()][this.getWidth()];
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth() / 2; j++) {
+                temp[i][j] = this.getPixel(i, j);
+                this.setPixel(i, j, this._image[i][this.getWidth() - 1 - j]);
+                this.setPixel(i, this.getWidth() - 1 - j, temp[i][j]);
+            }
+        }
+    }
+
+    /**
+     * Flips the image around the horizontal axis. The first row becomes the last
+     * row and the last row beocomes the first row.
+     */
+    public void flipVertical() {
+        RGBColor[][] temp = new RGBColor[this.getHeight()][this.getWidth()];
+        for (int i = 0; i < this.getHeight() / 2; i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                temp[i][j] = this.getPixel(i, j);
+                this.setPixel(i, j, this._image[this.getHeight() - 1 - i][j]);
+                this.setPixel(this.getHeight() - 1 - i, j, temp[i][j]);
+            }
+        }
+    }
+
+    /**
+     * Inverts the colors of the RGBImage
+     */
+    public void invertColors() {
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                this._image[i][j].invert();
+            }
+        }
+    }
+
+    /**
+     * Rotates the RGBImage 90 degress clockwise. May change the dimensions of the
+     * RGBImage.
+     */
+    public void rotateClockwise() {
+        RGBColor[][] temp = new RGBColor[this.getWidth()][this.getHeight()];
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                temp[j][this.getHeight() - i - 1] = this.getPixel(i, j);
+            }
+        }
+        this._image = temp;
+    }
+
+    /**
+     * Rotates the RGBImage 90 degress counter clockwise. May change the dimensions
+     * of the RGBImage.
+     */
+    public void rotateCounterClockwise() {
+        RGBColor[][] temp = new RGBColor[this.getWidth()][this.getHeight()];
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                temp[this.getWidth() - j - 1][i] = this.getPixel(i, j);
+            }
+        }
+        this._image = temp;
+    }
+
+    /**
+     * Offsets the RGBImage left or right based on given offset. Column 0 is moved
+     * into column offset and column 1 is moved to column offset+1. Checks if offset
+     * is negative or positive. If offset is bigger than RGBImage width or equal to
+     * 0 does nothing Any column that is moved into the RGBImage from outside is
+     * black.
+     * 
+     * @param offset Value to offset the RGBImage by
+     */
+    public void shiftCol(int offset) {
+        if (offset > this.getWidth() || offset == 0) {
+            return;
+        }
+        if (offset > 0) {
+            for (int i = 0; i < this.getHeight(); i++) {
+                for (int j = this.getWidth() - 1; j >= offset; j--) {
+                    this.setPixel(i, j, this.getPixel(i, j - offset));
+                    this.setPixel(i, j - offset, new RGBColor());
+                }
+            }
+        }
+        if (offset < 0) {
+            for (int i = 0; i < this.getHeight(); i++) {
+                for (int j = 0; j <= this.getWidth() + offset - 1; j++) {
+                    this.setPixel(i, j, this.getPixel(i, j - offset));
+                    this.setPixel(i, j - offset, new RGBColor());
+                }
+            }
+        }
+    }
+
+    /**
+     * Offsets the RGBImage up or down based on given offset. Row 0 is moved into
+     * row offset and row 1 is moved to row offset+1. Checks if offset is negative
+     * or positive. If offset is bigger than RGBImage height or equal to 0 does
+     * nothing Any row that is moved into the RGBImage from outside is black.
+     * 
+     * @param offset Value to offset the RGBImage by
+     */
+    public void shiftRow(int offset) {
+        if (offset > this.getHeight() || offset == 0) {
+            return;
+        }
+        if (offset > 0) {
+            for (int i = this.getHeight() - 1; i >= offset; i--) {
+                for (int j = 0; j < this.getWidth(); j++) {
+                    this.setPixel(i, j, this.getPixel(i - offset, j));
+                    this.setPixel(i - offset, j, new RGBColor());
+                }
+            }
+        }
+        if (offset < 0) {
+            for (int i = 0; i <= this.getHeight() + offset - 1; i++) {
+                for (int j = 0; j < this.getWidth(); j++) {
+                    this.setPixel(i, j, this.getPixel(i - offset, j));
+                    this.setPixel(i - offset, j, new RGBColor());
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the RGBImage in grayscale. The grayscale pixel is calculated based on
+     * the method in RGBColor.
+     * 
+     * @return A 2d array of double of the RGBImage in grayscale
+     */
+    public double[][] toGrayscaleArray() {
+        double[][] grayScaleArray = new double[this.getHeight()][this.getWidth()];
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                grayScaleArray[i][j] = this._image[i][j].convertToGrayscale();
+            }
+        }
+        return (grayScaleArray);
+    }
+
+    /**
+     * Returns a string representation of this RGBImage
+     * 
+     * @return String repressentation of this RGBImage
+     */
+    public String toString() {
+        String imageString = "";
+        for (int i = 0; i < this.getHeight(); i++) {
+            for (int j = 0; j < this.getWidth(); j++) {
+                if (j < this.getWidth() - 1) {
+                    imageString += this._image[i][j].toString() + " ";
+                }
+            }
+            imageString += "\r\n";
+        }
+        return (imageString);
+    }
+
+    /**
+     * Returns an RGBColor array based on this RGBImage
+     * 
+     * @return RGBColor array
+     */
+    public RGBColor[][] toRGBColorArray() {
+        return this._image;
+    }
+}
